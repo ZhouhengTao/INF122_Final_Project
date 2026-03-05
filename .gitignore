@@ -20,3 +20,6 @@
 
 # Local environment
 *.env
+
+# Build output
+out/
