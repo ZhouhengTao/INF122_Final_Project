@@ -1,38 +1,46 @@
 package gmae;
 
+import gmae.adventure.AdventureRegistry;
+import gmae.adventure.MiniAdventure;
+import gmae.adventures.CaravanTradeAdventure;
+import gmae.adventures.RelicHuntAdventure;
 import gmae.menu.MenuController;
+import gmae.model.Player;
 import gmae.profile.ProfileManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class GMAE_APP extends Application {
 
-    private MenuController menuController;
+    private Stage primaryStage;
     private ProfileManager profileManager;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage stage) {
+        this.primaryStage = stage;
         initialize();
 
-        // GUI to be expanded later
-        StackPane root = new StackPane(new Label("GMAE ..."));
-        primaryStage.setScene(new Scene(root, 900, 650));
-        primaryStage.setTitle("GMAE - GuildQuest Mini-Adventure Environment");
-        primaryStage.setResizable(false);
-        primaryStage.show();
+        stage.setTitle("GMAE - GuildQuest Mini-Adventure Environment");
+        stage.setResizable(false);
+        showMainMenu();
+        stage.show();
     }
 
     public void initialize() {
         profileManager = new ProfileManager();
         profileManager.loadProfiles();
 
-        // TODO: CaravanTradeAdventure
-        // TODO: RelicHuntAdventure
+        AdventureRegistry.register(new CaravanTradeAdventure());
+        AdventureRegistry.register(new RelicHuntAdventure());
+    }
 
-        menuController = new MenuController();
+    public void showMainMenu() {
+        MenuController ctrl = new MenuController(this, profileManager);
+        primaryStage.setScene(new Scene(ctrl.buildView(), 900, 650));
+    }
+
+    public void showGame(Player p1, Player p2, MiniAdventure adventure) {
     }
 
     @Override
