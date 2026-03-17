@@ -8,7 +8,7 @@ import gmae.adventure.Result;
 import gmae.model.Inventory;
 import gmae.model.Item;
 import gmae.model.Player;
-import gmae.model.Realm;
+import gmae.model.RealmView;
 import gmae.model.RealmMap;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class CaravanTradeAdventure extends MiniAdventure {
     private final int maxRounds;
 
     private final Map<Player, Integer> gold = new LinkedHashMap<>();
-    private final Map<Realm, TradeList> marketByRealm = new LinkedHashMap<>();
+    private final Map<RealmView, TradeList> marketByRealm = new LinkedHashMap<>();
     private final List<TradeOrder> openOrders = new ArrayList<>();
 
     private Player player1;
@@ -154,7 +154,7 @@ public class CaravanTradeAdventure extends MiniAdventure {
         }
 
         switch (action.getType()) {
-            case MOVE -> move(player, (Realm) action.getParam("target"));
+            case MOVE -> move(player, (RealmView) action.getParam("target"));
             case BUY -> buyGoods(
                     player,
                     (String) action.getParam("itemName"),
@@ -220,11 +220,11 @@ public class CaravanTradeAdventure extends MiniAdventure {
 
     // Initialize players, markets, orders, and starting gold.
     private void buildMarkets() {
-        List<Realm> realms = new ArrayList<>(realmMap.getRealms());
-        realms.sort(Comparator.comparing(Realm::getId));
+        List<RealmView> realms = new ArrayList<>(realmMap.getRealms());
+        realms.sort(Comparator.comparing(RealmView::getId));
 
         for (int realmIndex = 0; realmIndex < realms.size(); realmIndex++) {
-            Realm realm = realms.get(realmIndex);
+            RealmView realm = realms.get(realmIndex);
             Map<String, Integer> buyPrices = new LinkedHashMap<>();
             Map<String, Integer> sellPrices = new LinkedHashMap<>();
 
@@ -241,8 +241,8 @@ public class CaravanTradeAdventure extends MiniAdventure {
     }
 
     private void assignStartingRealms() {
-        List<Realm> realms = new ArrayList<>(realmMap.getRealms());
-        realms.sort(Comparator.comparing(Realm::getId));
+        List<RealmView> realms = new ArrayList<>(realmMap.getRealms());
+        realms.sort(Comparator.comparing(RealmView::getId));
         Collections.shuffle(realms, rng);
 
         player1.setRealm(realms.get(0));
@@ -250,13 +250,13 @@ public class CaravanTradeAdventure extends MiniAdventure {
     }
 
     private void replenishOrders() {
-        List<Realm> realms = new ArrayList<>(realmMap.getRealms());
-        realms.sort(Comparator.comparing(Realm::getId));
+        List<RealmView> realms = new ArrayList<>(realmMap.getRealms());
+        realms.sort(Comparator.comparing(RealmView::getId));
 
         while (openOrders.size() < DEFAULT_ORDER_COUNT) {
             String itemName = GOODS.get(rng.nextInt(GOODS.size()));
             int quantity = 1 + rng.nextInt(2);
-            Realm destination = realms.get(rng.nextInt(realms.size()));
+            RealmView destination = realms.get(rng.nextInt(realms.size()));
             int rewardGold = 6 + quantity + rng.nextInt(5);
             int turnsRemaining = 3 + rng.nextInt(3);
 
@@ -266,10 +266,10 @@ public class CaravanTradeAdventure extends MiniAdventure {
 
     // Return the list of actions currently available to the player.
     private Action promptMove(Player player, Scanner scanner) {
-        List<Realm> neighbors = realmMap.neighborsOf(player.getPosition());
+        List<RealmView> neighbors = realmMap.neighborsOf(player.getPosition());
         System.out.println("Choose a destination:");
         for (int i = 0; i < neighbors.size(); i++) {
-            Realm realm = neighbors.get(i);
+            RealmView realm = neighbors.get(i);
             System.out.printf("  %d. %s%n", i + 1, realm.getName());
         }
         int choice = readChoice(scanner, 1, neighbors.size(), "Destination");
@@ -338,8 +338,8 @@ public class CaravanTradeAdventure extends MiniAdventure {
     }
 
     // Apply the selected action (move, buy, sell, deliver, or pass).
-    private boolean move(Player player, Realm destination) {
-        Realm current = player.getPosition();
+    private boolean move(Player player, RealmView destination) {
+        RealmView current = player.getPosition();
         if (destination == null || current == null || !realmMap.isAdjacent(current, destination)) {
             System.out.println("Invalid move. Choose an adjacent realm.");
             return false;
@@ -508,7 +508,7 @@ public class CaravanTradeAdventure extends MiniAdventure {
     }
 
     private List<TradeOrder> fulfillableOrdersFor(Player player) {
-        Realm currentRealm = player.getPosition();
+        RealmView currentRealm = player.getPosition();
         Map<String, Long> goods = countGoodsByName(player);
 
         return openOrders.stream()
@@ -573,7 +573,7 @@ public class CaravanTradeAdventure extends MiniAdventure {
     }
 
     private String formatPlayer(Player player) {
-        Realm realm = player.getPosition();
+        RealmView realm = player.getPosition();
         TradeList market = marketByRealm.get(realm);
 
         return player.getProfile().getPlayerName()
