@@ -13,10 +13,10 @@ import java.util.Set;
 
 public class RealmMap {
 
-    private final Map<String, Realm> realmsById = new LinkedHashMap<>();
-    private final Map<Realm, Set<Realm>> adjacency = new LinkedHashMap<>();
+    private final Map<String, RealmView> realmsById = new LinkedHashMap<>();
+    private final Map<RealmView, Set<RealmView>> adjacency = new LinkedHashMap<>();
 
-    public void addRealm(Realm realm) {
+    public void addRealm(RealmView realm) {
         if (realm == null) {
             throw new IllegalArgumentException("Realm must not be null");
         }
@@ -24,26 +24,26 @@ public class RealmMap {
         adjacency.computeIfAbsent(realm, ignored -> new LinkedHashSet<>());
     }
 
-    public Realm getRealm(String id) {
+    public RealmView getRealm(String id) {
         return realmsById.get(id);
     }
 
-    public Collection<Realm> getRealms() {
+    public Collection<RealmView> getRealms() {
         return Collections.unmodifiableCollection(realmsById.values());
     }
 
-    public List<Realm> neighborsOf(Realm realm) {
+    public List<RealmView> neighborsOf(RealmView realm) {
         if (realm == null) {
             return List.of();
         }
-        Set<Realm> neighbors = adjacency.get(realm);
+        Set<RealmView> neighbors = adjacency.get(realm);
         if (neighbors == null) {
             return List.of();
         }
         return List.copyOf(neighbors);
     }
 
-    public boolean isAdjacent(Realm first, Realm second) {
+    public boolean isAdjacent(RealmView first, RealmView second) {
         if (first == null || second == null) {
             return false;
         }
@@ -51,15 +51,15 @@ public class RealmMap {
     }
 
     public void connect(String firstId, String secondId) {
-        Realm first = getRealm(firstId);
-        Realm second = getRealm(secondId);
+        RealmView first = getRealm(firstId);
+        RealmView second = getRealm(secondId);
         if (first == null || second == null) {
             throw new IllegalArgumentException("Both realms must exist before connecting them");
         }
         connect(first, second);
     }
 
-    public void connect(Realm first, Realm second) {
+    public void connect(RealmView first, RealmView second) {
         Objects.requireNonNull(first, "First realm must not be null");
         Objects.requireNonNull(second, "Second realm must not be null");
         addRealm(first);
@@ -68,11 +68,14 @@ public class RealmMap {
         adjacency.get(second).add(first);
     }
 
-    public Realm randomRealm(Random rng) {
+    public RealmView randomRealm(Random rng) {
+        if (rng == null) {
+            throw new IllegalArgumentException("Random must not be null");
+        }
         if (realmsById.isEmpty()) {
             return null;
         }
-        List<Realm> realms = new ArrayList<>(realmsById.values());
+        List<RealmView> realms = new ArrayList<>(realmsById.values());
         return realms.get(rng.nextInt(realms.size()));
     }
 
@@ -82,15 +85,17 @@ public class RealmMap {
         }
 
         RealmMap map = new RealmMap();
-        Realm[][] grid = new Realm[rows][cols];
+        RealmView[][] grid = new RealmView[rows][cols];
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                Realm realm = new Realm(
-                        "R" + row + "C" + col,
+                Realm rawRealm = new Realm(
                         "Realm (" + row + "," + col + ")",
-                        "Grid cell at row " + row + ", column " + col
+                        "Grid cell at row " + row + ", column " + col,
+                        "row=" + row + ",col=" + col,
+                        null
                 );
+                RealmView realm = new RealmAdapter(rawRealm);
                 grid[row][col] = realm;
                 map.addRealm(realm);
             }
