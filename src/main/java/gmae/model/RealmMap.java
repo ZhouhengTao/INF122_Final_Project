@@ -15,9 +15,9 @@ public class RealmMap {
 
     // Addition: map contain a limited size
     private static final int MIN_ROWS = 3;
-    private static final int MAX_ROWS = 6;
+    private static final int MAX_ROWS = 8;
     private static final int MIN_COLS = 3;
-    private static final int MAX_COLS = 6;
+    private static final int MAX_COLS = 8;
 
 
     // Addition: Contain the actual 2D board
@@ -144,9 +144,8 @@ public class RealmMap {
         int maxRealmCount = Math.max(minRealmCount, (int) Math.floor(totalCells * 0.85));
 
         List<RealmCatalog.RealmTemplate> catalog = new ArrayList<>(RealmCatalog.getFixedPool());
-        if (minRealmCount > catalog.size()) {
-            throw new IllegalArgumentException("Fixed realm pool is too small for this board size");
-        }
+        minRealmCount = Math.min(minRealmCount, catalog.size());
+        maxRealmCount = Math.min(maxRealmCount, catalog.size());
 
         int realmCount = minRealmCount + rng.nextInt(maxRealmCount - minRealmCount + 1);
 
@@ -250,7 +249,14 @@ public class RealmMap {
         return neighbors;
     }
 
-    // Update: 
+    // Creates a map with a randomly chosen square size between minSize and maxSize (inclusive).
+    public static RealmMap createRandomSizedGrid(int minSize, int maxSize) {
+        Random rng = new Random();
+        int size = minSize + rng.nextInt(maxSize - minSize + 1);
+        return createRandomBoard(size, size, rng);
+    }
+
+    // Update:
     public static RealmMap createGrid(int rows, int cols) {
         return createRandomBoard(rows, cols, new Random());
     /* Previous implementation that created a grid by first creating the realms and then connecting them.

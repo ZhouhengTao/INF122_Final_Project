@@ -44,7 +44,7 @@ public class RelicHuntAdventure extends MiniAdventure {
     private Result result;
 
     public RelicHuntAdventure() {
-        this(RealmMap.createGrid(3, 3));
+        this(RealmMap.createRandomSizedGrid(6, 8));
     }
 
     public RelicHuntAdventure(RealmMap realmMap) {

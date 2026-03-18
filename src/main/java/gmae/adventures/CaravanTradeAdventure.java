@@ -54,7 +54,7 @@ public class CaravanTradeAdventure extends MiniAdventure {
     private Result result;
 
     public CaravanTradeAdventure() {
-        this(RealmMap.createGrid(3, 3));
+        this(RealmMap.createRandomSizedGrid(6, 8));
     }
 
     public CaravanTradeAdventure(RealmMap realmMap) {
