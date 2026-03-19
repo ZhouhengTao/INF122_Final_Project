@@ -31,11 +31,13 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GameView {
 
-    private final MiniAdventure adventure;
+    private final Supplier<MiniAdventure> adventureFactory;
+    private MiniAdventure adventure;
     private final Player player1;
     private final Player player2;
     private final Runnable onBackToMenu;
@@ -51,10 +53,11 @@ public class GameView {
     private VBox logBox;
     private GridPane mapGrid;
 
-    public GameView(Player p1, Player p2, MiniAdventure adventure, Runnable onBackToMenu) {
+    public GameView(Player p1, Player p2, Supplier<MiniAdventure> adventureFactory, Runnable onBackToMenu) {
         this.player1 = p1;
         this.player2 = p2;
-        this.adventure = adventure;
+        this.adventureFactory = adventureFactory;
+        this.adventure = adventureFactory.get();
         this.onBackToMenu = onBackToMenu;
     }
 
@@ -531,6 +534,7 @@ public class GameView {
         Button playAgainBtn = new Button("Play Again");
         playAgainBtn.setStyle("-fx-font-size: 13; -fx-padding: 8 24;");
         playAgainBtn.setOnAction(e -> {
+            adventure = adventureFactory.get();
             adventure.init(player1, player2);
             currentPlayer = player1;
             player1Done = false;

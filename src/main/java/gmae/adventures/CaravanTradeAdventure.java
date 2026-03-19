@@ -280,6 +280,7 @@ public class CaravanTradeAdventure extends MiniAdventure {
         TradeList market = marketByRealm.get(player.getPosition());
         List<String> goods = new ArrayList<>(market.getItemNames());
         goods.sort(String::compareTo);
+        goods.removeIf(name -> market.getBuyPrice(name) <= 0 || getGold(player) < market.getBuyPrice(name));
 
         System.out.println("Choose a good to buy:");
         for (int i = 0; i < goods.size(); i++) {
@@ -289,7 +290,7 @@ public class CaravanTradeAdventure extends MiniAdventure {
 
         int itemChoice = readChoice(scanner, 1, goods.size(), "Good");
         String itemName = goods.get(itemChoice - 1);
-        int maxAffordable = Math.max(1, getGold(player) / market.getBuyPrice(itemName));
+        int maxAffordable = getGold(player) / market.getBuyPrice(itemName);
         int cappedMax = Math.min(3, maxAffordable);
 
         int quantity = readChoice(scanner, 1, cappedMax, "Quantity");

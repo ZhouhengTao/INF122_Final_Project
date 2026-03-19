@@ -149,6 +149,9 @@ public class RelicHuntAdventure extends MiniAdventure {
             return;
         }
         defendingPlayers.clear();
+        for (ActiveEffects effects : activeEffects.values()) {
+            effects.autoBlockRealm = null;
+        }
         currentRound++;
         if (currentRound > maxRounds) {
             result = determineWinnerByRelicCount();

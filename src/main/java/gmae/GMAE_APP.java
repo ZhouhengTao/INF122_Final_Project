@@ -11,6 +11,7 @@ import gmae.profile.ProfileManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import java.util.function.Supplier;
 
 public class GMAE_APP extends Application {
 
@@ -42,17 +43,16 @@ public class GMAE_APP extends Application {
     }
 
     public void showGame(Player p1, Player p2, MiniAdventure adventure) {
-        // Create a fresh adventure instance so the map is regenerated for each game
-        MiniAdventure freshAdventure;
+        Supplier<MiniAdventure> factory;
         if (adventure instanceof CaravanTradeAdventure) {
-            freshAdventure = new CaravanTradeAdventure();
+            factory = CaravanTradeAdventure::new;
         } else if (adventure instanceof RelicHuntAdventure) {
-            freshAdventure = new RelicHuntAdventure();
+            factory = RelicHuntAdventure::new;
         } else {
-            freshAdventure = adventure;
+            factory = () -> adventure;
         }
 
-        GameView gameView = new GameView(p1, p2, freshAdventure, this::showMainMenu);
+        GameView gameView = new GameView(p1, p2, factory, this::showMainMenu);
         primaryStage.setScene(new Scene(gameView.buildView(), 1280, 800));
     }
 
