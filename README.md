@@ -6,6 +6,8 @@
 
 A two-player local mini-adventure framework set in the GuildQuest world. Players create profiles, pick a mini-adventure from the menu, and compete turn-by-turn through a JavaFX GUI.
 
+> **Extra Credit:** We implemented a full **JavaFX graphical user interface (GUI)** for the GMAE, including the main menu, adventurer roster, interactive game board, action panel, and game log. The GUI replaces all terminal/console interaction and provides a complete visual player experience as described in the Extra Credit section of the project spec.
+
 ---
 
 ## Requirements
